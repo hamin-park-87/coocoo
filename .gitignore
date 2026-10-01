@@ -1,0 +1,7 @@
+node_modules/
+.env
+.env.local
+*.log
+# 작업용 레포 클론 위치(런타임 생성)
+/workspace/
+/tmp/

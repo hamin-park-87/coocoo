@@ -1,0 +1,25 @@
+{
+  "name": "coocoo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "coocoo — Slack에서 대화로 cc-os 레포를 수정하고 PR을 여는 AI 개발 봇 (Claude Agent SDK)",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "dev": "tsx watch src/index.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/claude-agent-sdk": "latest",
+    "@octokit/rest": "^21.0.2",
+    "@slack/bolt": "^4.2.0",
+    "dotenv": "^16.4.7",
+    "tsx": "^4.19.2"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.3",
+    "typescript": "^7.0.2"
+  }
+}
