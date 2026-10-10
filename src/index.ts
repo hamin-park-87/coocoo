@@ -32,11 +32,13 @@ async function handleRequest(params: {
   say: SayFn;
 }) {
   const { text, threadTs, say } = params;
+  console.log(`[req] 시작 text="${text}"`);
 
   await say({ thread_ts: threadTs, text: `🐣 coocoo 작업 시작할게요.\n> ${text}` });
 
   await ensureFreshRepo();
   const branch = await createBranch(text.slice(0, 40));
+  console.log(`[req] branch=${branch}`);
 
   // 진행상황은 과도한 스팸 방지를 위해 간헐적으로만 게시
   let lastPost = 0;
@@ -52,7 +54,10 @@ async function handleRequest(params: {
     },
   });
 
+  console.log(`[req] agent 완료 (${final.length}자)`);
+
   const files = await changedFiles();
+  console.log(`[req] 변경파일 ${files.length}개: ${files.join(", ")}`);
   if (files.length === 0) {
     await say({
       thread_ts: threadTs,
@@ -95,6 +100,7 @@ app.event("app_mention", async ({ event, say, context }) => {
   // 멘션 토큰 제거 → 순수 요청문
   const botId = context.botUserId ? `<@${context.botUserId}>` : "";
   const text = (ev.text || "").replace(botId, "").replace(/<@[A-Z0-9]+>/g, "").trim();
+  console.log(`[event] ch=${channel} user=${user} text="${text}"`);
 
   const sayFn = say as unknown as SayFn;
 
@@ -107,9 +113,13 @@ app.event("app_mention", async ({ event, say, context }) => {
     await enqueue(() => handleRequest({ text, user, channel, threadTs, say: sayFn }));
   } catch (e) {
     const msg = (e as Error).message || String(e);
+    console.error("[req] 오류", e);
     await sayFn({ thread_ts: threadTs, text: `❌ 오류: ${msg.slice(0, 1500)}` });
   }
 });
 
 await app.start();
 console.log("🐣 coocoo 가동 (Socket Mode). @coocoo 로 호출하세요.");
+console.log(
+  `[config] 허용 채널: ${cfg.allowedChannels.length ? cfg.allowedChannels.join(", ") : "(전체)"} | 레포: ${cfg.repoUrl} | 모델: ${cfg.model}`
+);
